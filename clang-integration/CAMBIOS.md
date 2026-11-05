@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- El reintento de libpq superó la configuración C99, pero falló al compilar: Meson identificó el compilador como `clang-cl` y seleccionó rutas de Windows ajenas a ese frontend, sin incluir el adaptador `win32_msvc`; además sus pruebas eligieron `cpuid.h`, que entra en conflicto con `intrin.h`. Dos parches específicos reconocen el frontend `clang-cl` en la selección de rutas y prefieren las pruebas de intrínsecos de Windows. Son cambios candidatos pendientes de compilar; no modifican Clang ni el runtime.
+
 - libpq falló en la prueba C99 de Meson al incluir `tgmath.h`: el encabezado de Clang usa tipos complejos incompatibles con el `complex.h` del runtime instalado. La búsqueda en las fuentes encontró `tgmath.h` únicamente en esa prueba. El parche para esta integración retira solo esa inclusión de la prueba, que sigue comprobando otras construcciones C99; no afirma que `tgmath.h` funcione. Pendiente de validar la construcción de libpq.
 
 - OpenSSL se detuvo antes de configurar porque su helper exige `nmake`. Para el toolchain independiente se usa `jom`, auxiliar compatible con makefiles de NMake que vcpkg obtiene; la receta sigue pasando explícitamente el compilador, enlazador y archivador LLVM detectados. El reintento completó Debug y Release y pasó la validación de vcpkg; hubo advertencia de PDB. El funcionamiento criptográfico en ejecución no se ha probado.

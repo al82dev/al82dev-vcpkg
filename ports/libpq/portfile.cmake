@@ -8,6 +8,7 @@ vcpkg_download_distfile(ARCHIVE
 set(clang_patches)
 if(VCPKG_TARGET_IS_WINDOWS AND DEFINED VCPKG_CLANG_SDK_ROOT)
     list(APPEND clang_patches windows/clang-c99-probe.patch)
+    list(APPEND clang_patches windows/clang-windows-frontend.patch windows/clang-cpuid-probe.patch)
 endif()
 
 vcpkg_extract_source_archive(
