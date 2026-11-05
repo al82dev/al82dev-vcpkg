@@ -21,9 +21,23 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- En el siguiente intento de ICU, vcpkg completó `all` e `install` de Debug con `lld-link` y `llvm-lib`, y comenzó Release. La instalación completa y la compatibilidad C++ siguen pendientes de verificación.
+
+- ICU superó la creación de `icudtd79.dll` con `lld-link` y posteriormente `pkgdata` falló al invocar `LIB.exe` para `uconvmsg.lib`. El port dirige esa llamada fija a `llvm-lib.exe` del LLVM configurado. Pendiente de validar la instalación completa.
+
+- Inspección de la DLL GLEW instalada con `llvm-readobj --coff-exports`: aparecen los nombres C `glewInit` y `wglewInit`. Esto no valida el conjunto completo de exportaciones ni el consumo desde NativeSharp.
+
+- ICU superó el cierre de `Ecliptic` en la compilación completa Debug y avanzó a `pkgdata`. Esa herramienta invocó `link.exe` fijo, que resolvió a `link` de coreutils y falló al crear `icudtd79.dll`. El port cambia esa invocación en las fuentes extraídas a `lld-link.exe`, encontrado mediante el PATH preparado con el LLVM configurado; el enlazador de las reglas de make ya se seleccionaba por su ruta. Pendiente de validar en el siguiente intento.
+
+- Tras autorizar las compilaciones, el agente ejecutó el diagnóstico de ICU: tanto el caso original como el caso sin información de depuración terminaron con código 139 en `resultados-qe71ROCX`. Esa comparación no demuestra que la información de depuración cause el cierre.
+
+- ICU: el reproductor preprocesado falló con excepción `0xC0000005` tanto con la asignación implícita como con `= default`. Con una asignación explícita `noexcept` de `UMemory`, `latitude` y `longitude`, Clang terminó la compilación del reproductor (carpeta `buildtrees/icu/icu-clang-probe-74n9bozh`). `clang-ecliptic-assignment.patch` aplica esa variante solo a Clang con ABI de Windows. Cambia la trivialidad del operador C++ de una clase interna y no altera las declaraciones de la API C; compatibilidad binaria C++ y compilación completa de ICU todavía requieren verificación.
+
+- El primer intento del diagnóstico de ICU no alcanzó al compilador porque `cygpath` no estaba en PATH. `repro.cmd` ahora agrega temporalmente `usr/bin` del MSYS2 configurado para las herramientas auxiliares; no selecciona su compilador. El diagnóstico se repitió y su resultado se registra arriba.
+
 - El 5 de noviembre, la instalación ejecutada por el agente con `clang-cl` de `C:/clang-llvm` compiló GLEW 2.3.1 en Debug y Release y superó la validación de vcpkg usando `clang-vcruntime.patch`. Se advirtió que no se encontraron PDB correspondientes. La carga y consumo desde NativeSharp no se han verificado. GLEW se retira de las solicitudes explícitas posteriores salvo que vcpkg lo requiera como dependencia.
 
-- Se preparó `icu-diagnostico/repro.cmd` con dos ejecuciones comparativas del reproductor preprocesado de Clang: original y sin información de depuración. Los scripts e instrucciones están sin ejecutar y no corrigen ICU; su entrada temporal no forma parte del respaldo. Los resultados se guardan en una carpeta nueva dentro del repositorio para que el usuario los ejecute y comparta.
+- Se preparó `icu-diagnostico/repro.cmd` con dos ejecuciones comparativas del reproductor preprocesado de Clang: original y sin información de depuración. El diagnóstico no corrige ICU; su entrada temporal no forma parte del respaldo. Los resultados se guardan en una carpeta nueva dentro del repositorio.
 
 - GLEW 2.3.1 falló en Release al enlazar `memset`: el objeto solicita `msvcrt.lib` y deja `memset` sin resolver; la inspección de `A:/vc2026-runtime` encontró el símbolo en `vcruntime.lib`. Con autorización del usuario para usar ese runtime, el port añade un parche limitado a Clang con DLL y runtime dinámico: enlaza `vcruntime.lib` en Release y `vcruntimed.lib` en Debug. El parche no cambia los triplets estáticos. **Corrección candidata no compilada**; el enlace y la ejecución siguen pendientes.
 
