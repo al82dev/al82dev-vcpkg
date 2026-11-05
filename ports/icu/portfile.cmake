@@ -42,6 +42,8 @@ if(DEFINED VCPKG_CLANG_SDK_ROOT)
     # The Clang launcher puts the configured LLVM bin directory first on PATH.
     vcpkg_replace_string("${SOURCE_PATH}/source/tools/pkgdata/pkgdata.cpp"
         "link.exe /nologo /release /out:" "lld-link.exe /nologo /release /out:" IGNORE_UNCHANGED)
+    vcpkg_replace_string("${SOURCE_PATH}/source/tools/pkgdata/pkgdata.cpp"
+        "LIB.exe /nologo /out:" "llvm-lib.exe /nologo /out:" IGNORE_UNCHANGED)
 endif()
 
 vcpkg_find_acquire_program(PYTHON3)
