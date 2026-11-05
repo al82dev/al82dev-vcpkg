@@ -147,6 +147,16 @@ if(subdirs)
         endif()
     endif()
 
+    if(DEFINED VCPKG_CLANG_SDK_ROOT)
+        set(clang_gettext_ar "${_clang_msys_root}/clang64/bin/llvm-ar.exe")
+        if(NOT EXISTS "${clang_gettext_ar}")
+            message(FATAL_ERROR "CLANG64 llvm-ar not found: ${clang_gettext_ar}")
+        endif()
+        # libtool must extract members of convenience archives; llvm-lib does
+        # not implement the extraction operation required by ar-lib.
+        list(APPEND OPTIONS "AR=${clang_gettext_ar}" "ARFLAGS=cr")
+    endif()
+
     file(REMOVE "${CURRENT_BUILDTREES_DIR}/config.cache-${TARGET_TRIPLET}-rel.log")
     vcpkg_configure_make(SOURCE_PATH "${SOURCE_PATH}"
         DETERMINE_BUILD_TRIPLET
