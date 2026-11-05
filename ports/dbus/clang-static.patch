@@ -1,0 +1,28 @@
+diff --git a/dbus/CMakeLists.txt b/dbus/CMakeLists.txt
+index 04f9ca2..c7a1ca6 100644
+--- a/dbus/CMakeLists.txt
++++ b/dbus/CMakeLists.txt
+@@ -263,13 +263,21 @@ find_library(LIBRT rt)
+ find_library(LIBSOCKET socket)
+ 
+ ### Client library
+-add_library(dbus-1 SHARED
++if(VCPKG_DBUS_STATIC)
++    set(dbus_library_type STATIC)
++else()
++    set(dbus_library_type SHARED)
++endif()
++add_library(dbus-1 ${dbus_library_type}
+     ${libdbus_SOURCES}
+     ${libdbus_HEADERS}
+ )
++if(VCPKG_DBUS_STATIC)
++    target_compile_definitions(dbus-1 PUBLIC DBUS_STATIC_BUILD)
++endif()
+ 
+ if(WIN32)
+-    if(DEFINED DBUS_LIBRARY_REVISION)
++    if(DEFINED DBUS_LIBRARY_REVISION AND NOT VCPKG_DBUS_STATIC)
+         set_target_properties(dbus-1 PROPERTIES SUFFIX "-${DBUS_LIBRARY_MAJOR}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+         add_custom_command(TARGET dbus-1 POST_BUILD
+             COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:dbus-1>" "$<TARGET_FILE_DIR:dbus-1>/${CMAKE_SHARED_LIBRARY_PREFIX}dbus-1${CMAKE_SHARED_LIBRARY_SUFFIX}"

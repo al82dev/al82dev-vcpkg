@@ -1,4 +1,9 @@
-vcpkg_check_linkage(ONLY_DYNAMIC_LIBRARY)
+if(VCPKG_TARGET_IS_WINDOWS AND DEFINED VCPKG_CLANG_SDK_ROOT AND VCPKG_LIBRARY_LINKAGE STREQUAL "static")
+    set(_clang_dbus_static ON)
+else()
+    vcpkg_check_linkage(ONLY_DYNAMIC_LIBRARY)
+    set(_clang_dbus_static OFF)
+endif()
 
 vcpkg_from_gitlab(
     GITLAB_URL https://gitlab.freedesktop.org/
@@ -15,6 +20,7 @@ vcpkg_from_gitlab(
         remove-path.patch
         remove-var-lib-dbus-creation.patch
         session-socket-dir.diff
+        clang-static.patch
 )
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS options
@@ -36,6 +42,7 @@ vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         -DDBUS_BUILD_TESTS=OFF
+        "-DVCPKG_DBUS_STATIC=${_clang_dbus_static}"
         -DDBUS_ENABLE_DOXYGEN_DOCS=OFF
         -DDBUS_ENABLE_XML_DOCS=OFF
         -DDBUS_INSTALL_SYSTEM_LIBS=OFF
