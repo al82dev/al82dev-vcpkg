@@ -18,14 +18,21 @@ if(VCPKG_TARGET_IS_WINDOWS AND NOT VCPKG_TARGET_IS_MINGW)
       set(LIBUSB_PROJECT_TYPE static)
   endif()
 
-  # The README.md file in the archive is a symlink to README
-  # which causes issues with the windows MSBUILD process
-  file(REMOVE "${SOURCE_PATH}/README.md")
-
-  vcpkg_msbuild_install(
-      SOURCE_PATH "${SOURCE_PATH}"
-      PROJECT_SUBPATH msvc/libusb_${LIBUSB_PROJECT_TYPE}.vcxproj
-  )
+  if(DEFINED VCPKG_CLANG_SDK_ROOT)
+      vcpkg_cmake_configure(
+          SOURCE_PATH "${CURRENT_PORT_DIR}/clang-cmake"
+          OPTIONS "-DLIBUSB_SOURCE_DIR=${SOURCE_PATH}"
+      )
+      vcpkg_cmake_install()
+  else()
+      # The README.md file in the archive is a symlink to README
+      # which causes issues with the windows MSBUILD process
+      file(REMOVE "${SOURCE_PATH}/README.md")
+      vcpkg_msbuild_install(
+          SOURCE_PATH "${SOURCE_PATH}"
+          PROJECT_SUBPATH msvc/libusb_${LIBUSB_PROJECT_TYPE}.vcxproj
+      )
+  endif()
 
   file(INSTALL "${SOURCE_PATH}/libusb/libusb.h"  DESTINATION "${CURRENT_PACKAGES_DIR}/include/libusb-1.0")
   set(prefix "")
