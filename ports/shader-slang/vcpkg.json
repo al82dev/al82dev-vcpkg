@@ -7,6 +7,14 @@
   "supports": "(arm64 | x64) & (linux | osx | windows) & !uwp & !(static & staticcrt)",
   "dependencies": [
     {
+      "name": "zlib",
+      "platform": "windows & static"
+    },
+    {
+      "name": "zstd",
+      "platform": "windows & static"
+    },
+    {
       "name": "vcpkg-cmake",
       "host": true,
       "platform": "windows"

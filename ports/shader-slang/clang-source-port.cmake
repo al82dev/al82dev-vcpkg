@@ -8,7 +8,7 @@ get_filename_component(_clang_buildtrees_root "${CURRENT_BUILDTREES_DIR}" DIRECT
 get_filename_component(_clang_vcpkg_root "${_clang_buildtrees_root}" DIRECTORY)
 set(_clang_llvm_md "${_clang_buildtrees_root}/llvm-clang-md-install")
 set(_clang_zstd "${_clang_vcpkg_root}/installed/x64-windows-clang-static-md/share/zstd")
-if(NOT EXISTS "${_clang_llvm_md}/lib/cmake/clang/ClangConfig.cmake" OR NOT EXISTS "${_clang_zstd}/zstdConfig.cmake")
+if(NOT VCPKG_LIBRARY_LINKAGE STREQUAL "static" AND (NOT EXISTS "${_clang_llvm_md}/lib/cmake/clang/ClangConfig.cmake" OR NOT EXISTS "${_clang_zstd}/zstdConfig.cmake"))
     message(FATAL_ERROR "Standalone Slang needs the /MD LLVM auxiliary installation and static-MD zstd. See clang-integration/slang-diagnostico/README.md.")
 endif()
 
@@ -47,6 +47,11 @@ else()
     if(NOT _clang_patch_applied EQUAL 0)
         message(FATAL_ERROR "Slang source patch cannot be applied or verified in ${SOURCE_PATH}.")
     endif()
+endif()
+
+if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
+    include("${CMAKE_CURRENT_LIST_DIR}/clang-static-port.cmake")
+    return()
 endif()
 
 # The previous upstream port distributed the same Release binaries in both
