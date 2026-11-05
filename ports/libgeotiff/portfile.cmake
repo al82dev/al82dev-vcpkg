@@ -1,3 +1,8 @@
+set(clang_patches)
+if(VCPKG_TARGET_IS_WINDOWS AND DEFINED VCPKG_CLANG_SDK_ROOT)
+    list(APPEND clang_patches clang-definition.patch)
+endif()
+
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO OSGeo/libgeotiff
@@ -6,6 +11,7 @@ vcpkg_from_github(
     HEAD_REF master
     PATCHES
         cmakelists.patch
+        ${clang_patches}
 )
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS

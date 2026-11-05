@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- `libgeotiff` falló con `-D/DW4`, porque su CMake pasa `/DW4` a `target_compile_definitions`. Para esta integración se reemplazó por `W4`, conservando la definición con la sintaxis que espera CMake. El reintento completó Debug y Release y pasó la validación, con advertencia de PDB. Después se trasladó el mismo cambio a un parche aplicado al extraer fuentes para hacerlo repetible con `--editable`; esta última presentación del cambio está pendiente de volver a compilarse.
+
 - La ejecución autorizada instaló KTX, LCMS, libyuv, libavif con `aom` y `dav1d`, libdwarf y libogg; vcpkg completó su validación y se retiraron de las siguientes solicitudes explícitas. KTX, libavif, libdwarf y libogg avisaron por PDB ausentes. El uso de estas bibliotecas en aplicaciones no se ha probado.
 
 - `libflac` falló en Debug al compilar `getopt.c`: su declaración propia de `getenv` entra en conflicto con la declaración del runtime de Windows. Se añadió `clang-windows-getenv.patch`, seleccionado solo para esta integración Clang, que incluye `stdlib.h` en Windows y conserva la declaración anterior para otras plataformas. El reintento completó Debug y Release y superó la validación de vcpkg; hubo advertencias de PDB ausentes. Su funcionamiento en ejecución no se ha comprobado.
