@@ -22,7 +22,7 @@ vcpkg_download_distfile(ARCHIVE
 
 set(clang_gettext_patches "")
 if(DEFINED VCPKG_CLANG_SDK_ROOT)
-    list(APPEND clang_gettext_patches clang-iconv-flush-signature.patch)
+    list(APPEND clang_gettext_patches clang-iconv-flush-signature.patch clang-po-lex-attributes.patch)
 endif()
 
 vcpkg_extract_source_archive(SOURCE_PATH
