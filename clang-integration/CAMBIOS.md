@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- ICU 79.1 completó Debug y Release y superó la validación de vcpkg con las correcciones de Clang y `pkgdata`. Vcpkg advirtió que faltan PDB para las DLL. No se ha certificado el consumo de su API C desde NativeSharp ni la compatibilidad binaria C++ de la clase interna modificada.
+
 - En el siguiente intento de ICU, vcpkg completó `all` e `install` de Debug con `lld-link` y `llvm-lib`, y comenzó Release. La instalación completa y la compatibilidad C++ siguen pendientes de verificación.
 
 - ICU superó la creación de `icudtd79.dll` con `lld-link` y posteriormente `pkgdata` falló al invocar `LIB.exe` para `uconvmsg.lib`. El port dirige esa llamada fija a `llvm-lib.exe` del LLVM configurado. Pendiente de validar la instalación completa.
