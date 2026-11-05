@@ -21,7 +21,7 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
-- Se preservaron en `clang-integration/slang-diagnostico` los comandos actuales de diagnóstico de Slang y LLVM con instrucciones de restauración. Son una instantánea incompleta y deben adaptarse antes de enlazar contra el LLVM auxiliar; no sustituyen un port funcional.
+- Se preservaron en `clang-integration/slang-diagnostico` los comandos actuales de diagnóstico de Slang y LLVM con instrucciones de restauración. La configuración de Slang ya apunta al LLVM auxiliar, pero no se ha probado con él; estos archivos no sustituyen un port funcional.
 
 - La construcción auxiliar de LLVM con `/MD` produjo `LLVMSupport.lib` con la marca `MD_DynamicRelease`, confirmada mediante `llvm-readobj`. Después se detuvo en `atlbase.h`, ausente del sysroot, requerido por el lector DIA de PDB. LLVM también dispone de un lector PDB nativo y lo selecciona por defecto; para continuar el diagnóstico se configuró `LLVM_ENABLE_DIA_SDK=OFF`. Esto excluye el lector DIA de la copia auxiliar y no demuestra equivalencia con el LLVM original ni con todas las funciones de Slang; el resultado y su efecto deben verificarse antes de usarlo como solución definitiva.
 
