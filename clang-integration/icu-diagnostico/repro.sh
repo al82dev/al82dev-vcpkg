@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Read-only inputs; output only under a new diagnostics results directory.
+set -u
+: "${CLANG_LLVM_ROOT:?missing CLANG_LLVM_ROOT}"
+: "${ASTRO_INPUT:?missing ASTRO_INPUT}"
+[ -f "$(cygpath -u "$ASTRO_INPUT")" ] || { echo "Missing preprocessed input: $ASTRO_INPUT" >&2; exit 2; }
+[ -f "$(cygpath -u "$CLANG_LLVM_ROOT/bin/clang-cl.exe")" ] || { echo "Missing configured clang-cl" >&2; exit 2; }
+base="$(cd "$(dirname "$0")" && pwd)"
+out="$(mktemp -d "$base/resultados-XXXXXXXX")" || exit 2
+export TMPDIR="$out"
+export TEMP="$(cygpath -w "$out")"
+export TMP="$TEMP"
+echo "Resultados: $out"
+echo "Compilando caso original..."
+"$CLANG_LLVM_ROOT/bin/clang-cl.exe" "-cc1" "-triple" "x86_64-pc-windows-msvc19.51.36260" "-O0" "-emit-obj" "-disable-free" "-clear-ast-before-backend" "-disable-llvm-verifier" "-discard-value-names" "-main-file-name" "astro.cpp" "-mrelocation-model" "pic" "-pic-level" "2" "-mframe-pointer=none" "-relaxed-aliasing" "-fmath-errno" "-ffp-contract=on" "-fno-rounding-math" "-mconstructor-aliases" "-fms-volatile" "-funwind-tables=2" "-target-cpu" "x86-64" "-mllvm" "-x86-asm-syntax=intel" "-tune-cpu" "generic" "-D_DEBUG" "-D_MT" "-D_DLL" "--dependent-lib=msvcrtd" "--dependent-lib=oldnames" "-stack-protector" "2" "-fcxx-exceptions" "-fexceptions" "-fexternc-nounwind" "-fdiagnostics-format" "msvc" "-gno-column-info" "-gcodeview" "-debug-info-kind=constructor" "-fdebug-compilation-dir=A:\\al82dev-vcpkg\\buildtrees\\icu\\x64-windows-clang-dbg\\i18n" "-object-file-name=A:\\al82dev-vcpkg\\buildtrees\\icu\\x64-windows-clang-dbg\\i18n\\astro.o" "-fcoverage-compilation-dir=A:\\al82dev-vcpkg\\buildtrees\\icu\\x64-windows-clang-dbg\\i18n" "-D" "U_DEBUG=1" "-D" "HAVE_DLOPEN=0" "-D" "U_HAVE_MMAP=0" "-D" "U_HAVE_POPEN=0" "-D" "U_HAVE_TZNAME=0" "-D" "_DEBUG=1" "-D" "_CRT_SECURE_NO_DEPRECATE" "-D" "U_ALL_IMPLEMENTATION" "-D" "U_ATTRIBUTE_DEPRECATED=" "-D" "WIN32" "-D" "CYGWINMSVC" "-D" "U_I18N_IMPLEMENTATION" "-D" "WIN32" "-D" "_WINDOWS" "-c-isystem" "A:\\al82dev-vcpkg\\installed\\x64-windows-clang\\include" "-cxx-isystem" "A:\\al82dev-vcpkg\\installed\\x64-windows-clang\\include" "-fdeprecated-macro" "-ferror-limit" "19" "-fno-use-cxa-atexit" "-fms-extensions" "-fms-compatibility" "-fwrapv" "-fms-compatibility-version=19.51.36260" "-std=c++17" "-fno-inline" "-fskip-odr-check-in-gmf" "-fdelayed-template-parsing" "-faddrsig" "-x" "c++" "$ASTRO_INPUT" -o "$out/original.obj" >"$out/original.log" 2>&1
+original_status=$?
+echo "Compilando caso sin informacion de depuracion..."
+"$CLANG_LLVM_ROOT/bin/clang-cl.exe" "-cc1" "-triple" "x86_64-pc-windows-msvc19.51.36260" "-O0" "-emit-obj" "-disable-free" "-clear-ast-before-backend" "-disable-llvm-verifier" "-discard-value-names" "-main-file-name" "astro.cpp" "-mrelocation-model" "pic" "-pic-level" "2" "-mframe-pointer=none" "-relaxed-aliasing" "-fmath-errno" "-ffp-contract=on" "-fno-rounding-math" "-mconstructor-aliases" "-fms-volatile" "-funwind-tables=2" "-target-cpu" "x86-64" "-mllvm" "-x86-asm-syntax=intel" "-tune-cpu" "generic" "-D_DEBUG" "-D_MT" "-D_DLL" "--dependent-lib=msvcrtd" "--dependent-lib=oldnames" "-stack-protector" "2" "-fcxx-exceptions" "-fexceptions" "-fexternc-nounwind" "-fdiagnostics-format" "msvc" "-fdebug-compilation-dir=A:\\al82dev-vcpkg\\buildtrees\\icu\\x64-windows-clang-dbg\\i18n" "-object-file-name=A:\\al82dev-vcpkg\\buildtrees\\icu\\x64-windows-clang-dbg\\i18n\\astro.o" "-fcoverage-compilation-dir=A:\\al82dev-vcpkg\\buildtrees\\icu\\x64-windows-clang-dbg\\i18n" "-D" "U_DEBUG=1" "-D" "HAVE_DLOPEN=0" "-D" "U_HAVE_MMAP=0" "-D" "U_HAVE_POPEN=0" "-D" "U_HAVE_TZNAME=0" "-D" "_DEBUG=1" "-D" "_CRT_SECURE_NO_DEPRECATE" "-D" "U_ALL_IMPLEMENTATION" "-D" "U_ATTRIBUTE_DEPRECATED=" "-D" "WIN32" "-D" "CYGWINMSVC" "-D" "U_I18N_IMPLEMENTATION" "-D" "WIN32" "-D" "_WINDOWS" "-c-isystem" "A:\\al82dev-vcpkg\\installed\\x64-windows-clang\\include" "-cxx-isystem" "A:\\al82dev-vcpkg\\installed\\x64-windows-clang\\include" "-fdeprecated-macro" "-ferror-limit" "19" "-fno-use-cxa-atexit" "-fms-extensions" "-fms-compatibility" "-fwrapv" "-fms-compatibility-version=19.51.36260" "-std=c++17" "-fno-inline" "-fskip-odr-check-in-gmf" "-fdelayed-template-parsing" "-faddrsig" "-x" "c++" "$ASTRO_INPUT" -o "$out/sin-debug.obj" >"$out/sin-debug.log" 2>&1
+nodebug_status=$?
+printf 'original=%s\nsin_debug=%s\n' "$original_status" "$nodebug_status" >"$out/estado.txt"
+echo "Original: $original_status; sin depuracion: $nodebug_status"
+echo "Comparte estado.txt y ambos archivos .log."
