@@ -38,6 +38,10 @@ if(DEFINED VCPKG_CLANG_SDK_ROOT)
         "link --version 2>&1" "\"${icu_clang_linker}\" --version 2>&1" IGNORE_UNCHANGED)
     vcpkg_replace_string("${SOURCE_PATH}/source/config/mh-msys-msvc"
         "LINK.EXE" "\"${icu_clang_linker}\"" IGNORE_UNCHANGED)
+    # pkgdata launches its own linker command independently of the make rules.
+    # The Clang launcher puts the configured LLVM bin directory first on PATH.
+    vcpkg_replace_string("${SOURCE_PATH}/source/tools/pkgdata/pkgdata.cpp"
+        "link.exe /nologo /release /out:" "lld-link.exe /nologo /release /out:" IGNORE_UNCHANGED)
 endif()
 
 vcpkg_find_acquire_program(PYTHON3)
