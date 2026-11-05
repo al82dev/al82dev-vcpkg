@@ -1,0 +1,9 @@
+--- a/meson.build
++++ b/meson.build
+@@ -1716,6 +1716,5 @@ c99_test = '''
+ #include <stdbool.h>
+ #include <complex.h>
+-#include <tgmath.h>
+ #include <inttypes.h>
+ 
+ struct named_init_test {

@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- libpq falló en la prueba C99 de Meson al incluir `tgmath.h`: el encabezado de Clang usa tipos complejos incompatibles con el `complex.h` del runtime instalado. La búsqueda en las fuentes encontró `tgmath.h` únicamente en esa prueba. El parche para esta integración retira solo esa inclusión de la prueba, que sigue comprobando otras construcciones C99; no afirma que `tgmath.h` funcione. Pendiente de validar la construcción de libpq.
+
 - OpenSSL se detuvo antes de configurar porque su helper exige `nmake`. Para el toolchain independiente se usa `jom`, auxiliar compatible con makefiles de NMake que vcpkg obtiene; la receta sigue pasando explícitamente el compilador, enlazador y archivador LLVM detectados. El reintento completó Debug y Release y pasó la validación de vcpkg; hubo advertencia de PDB. El funcionamiento criptográfico en ejecución no se ha probado.
 
 - `libgeotiff` falló con `-D/DW4`, porque su CMake pasa `/DW4` a `target_compile_definitions`. Para esta integración se reemplazó por `W4`, conservando la definición con la sintaxis que espera CMake. El reintento completó Debug y Release y pasó la validación, con advertencia de PDB. Después se trasladó el mismo cambio a un parche aplicado al extraer fuentes para hacerlo repetible con `--editable`; esta última presentación del cambio está pendiente de volver a compilarse.
