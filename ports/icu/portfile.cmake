@@ -5,6 +5,11 @@ vcpkg_download_distfile(
     SHA512 9098adf9ba7fbe11d92963415cc80bf09de39ce1372414dbc2561e5f8ef57479a9fe4b6f7abc61911e4659e5953be987c459297d29e61b064d1931a16195a973
 )
 
+set(icu_clang_patches "")
+if(DEFINED VCPKG_CLANG_SDK_ROOT)
+    list(APPEND icu_clang_patches clang-ecliptic-assignment.patch)
+endif()
+
 vcpkg_extract_source_archive(SOURCE_PATH
     ARCHIVE "${ARCHIVE}"
     PATCHES
@@ -17,6 +22,7 @@ vcpkg_extract_source_archive(SOURCE_PATH
         mh-msys-msvc.patch
         subdirs.patch
         vcpkg-cross-data.patch
+        ${icu_clang_patches}
 )
 
 vcpkg_find_acquire_program(PYTHON3)

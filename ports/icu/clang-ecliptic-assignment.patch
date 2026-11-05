@@ -1,0 +1,18 @@
+--- a/source/i18n/astro.h
++++ b/source/i18n/astro.h
+@@ -76,6 +76,15 @@
+    */
+   class U_I18N_API Ecliptic : public UMemory {
+   public:
++#if defined(__clang__) && defined(_MSC_VER)
++    Ecliptic& operator=(const Ecliptic& other) noexcept {
++      UMemory::operator=(other);
++      latitude = other.latitude;
++      longitude = other.longitude;
++      return *this;
++    }
++#endif
++
+     /**
+      * Constructs an Ecliptic coordinate object.
+      * <p>
