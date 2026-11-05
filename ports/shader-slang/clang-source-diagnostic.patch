@@ -59,7 +59,7 @@ index 6442bce..72e92cc 100644
  find_program(DUMPBIN_EXECUTABLE dumpbin)
  if(NOT DUMPBIN_EXECUTABLE)
 diff --git a/external/CMakeLists.txt b/external/CMakeLists.txt
-index 879c065..077737e 100644
+index 879c065..63025b2 100644
 --- a/external/CMakeLists.txt
 +++ b/external/CMakeLists.txt
 @@ -402,7 +402,7 @@ endif()
@@ -71,6 +71,23 @@ index 879c065..077737e 100644
      set(SLANG_RHI_BUILD_TESTS_WITH_GLFW OFF)
      set(SLANG_RHI_INSTALL OFF)
      set(SLANG_RHI_BINARY_DIR ${slang_BINARY_DIR}/$<CONFIG>/bin)
+@@ -446,10 +446,12 @@ if(SLANG_ENABLE_SLANG_RHI)
+     endif()
+ 
+     # Output slang-rhi-tests to the bin directory so we can run it easily.
+-    set_target_properties(
+-        slang-rhi-tests
+-        PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${slang_BINARY_DIR}/$<CONFIG>/bin
+-    )
++    if(TARGET slang-rhi-tests)
++        set_target_properties(
++            slang-rhi-tests
++            PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${slang_BINARY_DIR}/$<CONFIG>/bin
++        )
++    endif()
+ endif()
+ 
+ # Tidy things up:
 diff --git a/source/slang-llvm/slang-llvm-builder.cpp b/source/slang-llvm/slang-llvm-builder.cpp
 index a29e75e..0a49f2e 100644
 --- a/source/slang-llvm/slang-llvm-builder.cpp
