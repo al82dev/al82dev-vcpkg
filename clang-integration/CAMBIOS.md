@@ -21,7 +21,7 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
-- ReactPhysics3D se instaló como biblioteca estática conforme a su port; `sdl3-image` con las características solicitadas pasó la validación de vcpkg. WavPack falló porque CMake asignó sus archivos MASM a `clang-cl` en vez de `llvm-ml64`. Se añadió un parche para marcar esos archivos como `ASM_MASM`, sin desactivar la optimización; pendiente de comprobar su compilación.
+- ReactPhysics3D se instaló como biblioteca estática conforme a su port; `sdl3-image` con las características solicitadas pasó la validación de vcpkg. WavPack falló porque CMake asignó sus archivos MASM a `clang-cl` en vez de `llvm-ml64`. El primer parche marcó esos archivos como `ASM_MASM`, pero CMake informó que el lenguaje no estaba habilitado; el parche ahora también lo habilita, sin desactivar la optimización. Pendiente de comprobar su compilación.
 
 - Por indicación del usuario, se detuvo la instalación durante la configuración de `qtbase` y se retiró Qt de la lista de paquetes y del comando pendiente. `vcpkg list qtbase` no mostró una instalación registrada; las demás bibliotecas instaladas se conservan. La tarea general permanece pausada.
 
