@@ -1,6 +1,6 @@
 # Diagnóstico de Shader Slang con Clang independiente
 
-Estado: **experimental e incompleto**. El port de `shader-slang` todavía instala binarios precompilados. Estos archivos preservan el diagnóstico, no una receta final de instalación ni una afirmación de compatibilidad funcional.
+Estado: **experimental e incompleto**. El port de `shader-slang` contiene una ruta candidata desde fuentes para el triplet Clang; aún no se ha validado su instalación mediante vcpkg. Estos archivos preservan el diagnóstico y no certifican la compatibilidad funcional completa.
 
 Los comandos se ejecutan desde la raíz del repositorio con `cmd.exe`. Las copias de esta carpeta deben trasladarse a `buildtrees` antes de ejecutarse, porque esa es la ruta que utilizan entre sí. Lea y ajuste primero las rutas absolutas de cada archivo: fijan el repositorio en `A:/al82dev-vcpkg`, las fuentes LLVM en `C:/llvm-project-23.1.0.src`, LLVM en `C:/clang-llvm`, el runtime en `A:/vc2026-runtime` y las versiones de Ninja y CMake descargadas por vcpkg. No escriben en las rutas de LLVM, sus fuentes ni el runtime.
 

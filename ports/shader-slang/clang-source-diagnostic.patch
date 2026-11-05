@@ -58,6 +58,19 @@ index 6442bce..72e92cc 100644
  # Find dumpbin - should be available in Visual Studio environment
  find_program(DUMPBIN_EXECUTABLE dumpbin)
  if(NOT DUMPBIN_EXECUTABLE)
+diff --git a/external/CMakeLists.txt b/external/CMakeLists.txt
+index 879c065..077737e 100644
+--- a/external/CMakeLists.txt
++++ b/external/CMakeLists.txt
+@@ -402,7 +402,7 @@ endif()
+ # slang-rhi
+ if(SLANG_ENABLE_SLANG_RHI)
+     set(SLANG_RHI_BUILD_FROM_SLANG_REPO ON)
+-    set(SLANG_RHI_BUILD_TESTS ON)
++    set(SLANG_RHI_BUILD_TESTS ${SLANG_ENABLE_TESTS})
+     set(SLANG_RHI_BUILD_TESTS_WITH_GLFW OFF)
+     set(SLANG_RHI_INSTALL OFF)
+     set(SLANG_RHI_BINARY_DIR ${slang_BINARY_DIR}/$<CONFIG>/bin)
 diff --git a/source/slang-llvm/slang-llvm-builder.cpp b/source/slang-llvm/slang-llvm-builder.cpp
 index a29e75e..0a49f2e 100644
 --- a/source/slang-llvm/slang-llvm-builder.cpp

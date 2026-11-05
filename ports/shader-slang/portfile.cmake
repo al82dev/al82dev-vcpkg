@@ -1,5 +1,10 @@
 vcpkg_check_linkage(ONLY_DYNAMIC_LIBRARY)
 
+if(VCPKG_TARGET_IS_WINDOWS AND DEFINED VCPKG_CLANG_SDK_ROOT)
+    include("${CMAKE_CURRENT_LIST_DIR}/clang-source-port.cmake")
+    return()
+endif()
+
 set(key NOTFOUND)
 if(VCPKG_TARGET_IS_WINDOWS)
 	set(key "windows-${VCPKG_TARGET_ARCHITECTURE}")
