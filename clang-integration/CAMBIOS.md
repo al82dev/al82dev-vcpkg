@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- SDL3 Mixer con las características solicitadas, SDL3 Net, SDL3 TTF y TinyXML2 completaron la instalación. El port original de Shader Slang instaló la distribución precompilada de upstream, no compilada con el LLVM configurado; por ello permanece pendiente una instalación desde fuentes. Se obtuvo el tag `v2026.20` y sus submódulos y se configuró un diagnóstico con `clang-cl` 23 y el LLVM de `C:/clang-llvm`. Este LLVM exige zlib, DIA y zstd estático; se instaló `zstd:x64-windows-clang-static-md` y se indicaron los archivos existentes de DIA del sysroot. La configuración ya genera Ninja; la construcción desde fuentes continúa y no equivale todavía a un port reproducible ni a una instalación verificada. Upstream también descargó DXC y componentes web precompilados para este diagnóstico.
+
 - WavPack completó Debug y Release y superó la validación con las optimizaciones MASM ensambladas por `llvm-ml64`; hubo advertencia de PDB y no se ha probado su uso en ejecución. SDL3 Mixer se detuvo al buscar `dumpbin` para `libxmp` dinámico; se configuró el `llvm-dlltool` adyacente a Clang, como en SDL3. Pendiente de validar SDL3 Mixer.
 
 - El siguiente intento de WavPack invocó `llvm-ml64`, que rechazó `proc public frame` y las directivas de pila asociadas. En un reproductor pequeño se verificó que `public nombre` seguido de `nombre proc frame` genera símbolo público y datos de desenrollado COFF; un segundo parche aplica esa sintaxis a las seis funciones afectadas. La biblioteca completa aún no está validada.
