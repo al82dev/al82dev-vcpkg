@@ -1,6 +1,6 @@
 # Registro de cambios: integración Clang x64
 
-Este registro conserva el motivo y el estado de los cambios de la integración. Los resultados de compilación citados proceden de salidas proporcionadas por el usuario; el agente no ejecutó compilaciones, instalaciones ni pruebas.
+Este registro conserva el motivo y el estado de los cambios de la integración. Incluye tanto las salidas proporcionadas por el usuario como las compilaciones autorizadas posteriormente al agente, identificadas en cada entrada.
 
 ## Alcance y configuración
 
@@ -20,6 +20,10 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 - A petición del usuario, `restore.cmd` del respaldo reemplaza los archivos de la integración que ya existan y sean diferentes; conserva su estructura de rutas. También reemplaza `config.cmd`, por lo que sus rutas deben revisarse después de restaurar. El restaurador no se ha ejecutado ni probado.
 
 ## Evidencia y correcciones
+
+- La ejecución autorizada instaló KTX, LCMS, libyuv, libavif con `aom` y `dav1d`, libdwarf y libogg; vcpkg completó su validación y se retiraron de las siguientes solicitudes explícitas. KTX, libavif, libdwarf y libogg avisaron por PDB ausentes. El uso de estas bibliotecas en aplicaciones no se ha probado.
+
+- `libflac` falló en Debug al compilar `getopt.c`: su declaración propia de `getenv` entra en conflicto con la declaración del runtime de Windows. Se añadió `clang-windows-getenv.patch`, seleccionado solo para esta integración Clang, que incluye `stdlib.h` en Windows y conserva la declaración anterior para otras plataformas. Pendiente de confirmar con la instalación completa.
 
 - libjpeg-turbo 3.2.0 y Jasper 4.2.9 completaron la validación de vcpkg y se retiraron de la lista explícita de pendientes; ambas instalaciones produjeron advertencias de PDB.
 
