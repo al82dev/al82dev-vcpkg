@@ -1,0 +1,13 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -188,4 +188,10 @@ add_library(wavpack
+     $<$<AND:$<BOOL:${WAVPACK_ENABLE_ASM}>,$<BOOL:${HAVE_ASM}>,$<BOOL:${WavPack_CPU_ARM32}>>:src/unpack_armv7.S>
+     $<$<AND:$<BOOL:${WIN32}>,$<BOOL:${BUILD_SHARED_LIBS}>>:wavpackdll/wavpackdll.rc>
+ )
++if(WIN32 AND CMAKE_ASM_MASM_COMPILER)
++    set_source_files_properties(
++        src/pack_x86.asm src/unpack_x86.asm src/pack_x64.asm src/unpack_x64.asm
++        PROPERTIES LANGUAGE ASM_MASM
++    )
++endif()
+ target_include_directories(wavpack

@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- ReactPhysics3D se instaló como biblioteca estática conforme a su port; `sdl3-image` con las características solicitadas pasó la validación de vcpkg. WavPack falló porque CMake asignó sus archivos MASM a `clang-cl` en vez de `llvm-ml64`. Se añadió un parche para marcar esos archivos como `ASM_MASM`, sin desactivar la optimización; pendiente de comprobar su compilación.
+
 - Por indicación del usuario, se detuvo la instalación durante la configuración de `qtbase` y se retiró Qt de la lista de paquetes y del comando pendiente. `vcpkg list qtbase` no mostró una instalación registrada; las demás bibliotecas instaladas se conservan. La tarea general permanece pausada.
 
 - La campaña posterior completó la validación de `nlohmann-json`, `sqlite3[tool]`, `liblzma`, `libigl`, `libjxl`, `lz4`, `libraw`, `libsass`, `libsigcpp`, `libtheora`, `libtommath`, `libvorbis`, `libwebp[unicode]`, `md4c`, `mmx`, `mpg123`, `opus` y `opusfile`, retirándolos de las solicitudes siguientes. El port de `opusfile` lo instaló como biblioteca estática. También se instalaron las dependencias `tiff`, `proj`, `libxmp` y la herramienta `yasm`. Se observaron advertencias de PDB en varios paquetes. Esto no sustituye pruebas de uso en aplicaciones.
