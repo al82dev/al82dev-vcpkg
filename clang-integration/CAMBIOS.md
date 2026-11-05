@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- La campaña posterior completó la validación de `nlohmann-json`, `sqlite3[tool]`, `liblzma`, `libigl`, `libjxl`, `lz4`, `libraw`, `libsass`, `libsigcpp`, `libtheora`, `libtommath`, `libvorbis`, `libwebp[unicode]`, `md4c`, `mmx`, `mpg123`, `opus` y `opusfile`, retirándolos de las solicitudes siguientes. El port de `opusfile` lo instaló como biblioteca estática. También se instalaron las dependencias `tiff`, `proj`, `libxmp` y la herramienta `yasm`. Se observaron advertencias de PDB en varios paquetes. Esto no sustituye pruebas de uso en aplicaciones.
+
 - El reintento de libpq superó la configuración C99, pero falló al compilar: Meson identificó el compilador como `clang-cl` y seleccionó rutas de Windows ajenas a ese frontend, sin incluir el adaptador `win32_msvc`; además sus pruebas eligieron `cpuid.h`, que entra en conflicto con `intrin.h`. Dos parches específicos reconocen el frontend `clang-cl` en la selección de rutas y prefieren las pruebas de intrínsecos de Windows. El siguiente reintento completó Debug y Release y superó la validación de vcpkg. La comunicación con un servidor PostgreSQL no se ha probado.
 
 - libpq falló en la prueba C99 de Meson al incluir `tgmath.h`: el encabezado de Clang usa tipos complejos incompatibles con el `complex.h` del runtime instalado. La búsqueda en las fuentes encontró `tgmath.h` únicamente en esa prueba. El parche para esta integración retira solo esa inclusión de la prueba, que sigue comprobando otras construcciones C99; no afirma que `tgmath.h` funcione. La instalación de libpq se completó después con las correcciones adicionales indicadas arriba.
