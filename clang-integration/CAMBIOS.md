@@ -23,7 +23,7 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 - La ejecución autorizada instaló KTX, LCMS, libyuv, libavif con `aom` y `dav1d`, libdwarf y libogg; vcpkg completó su validación y se retiraron de las siguientes solicitudes explícitas. KTX, libavif, libdwarf y libogg avisaron por PDB ausentes. El uso de estas bibliotecas en aplicaciones no se ha probado.
 
-- `libflac` falló en Debug al compilar `getopt.c`: su declaración propia de `getenv` entra en conflicto con la declaración del runtime de Windows. Se añadió `clang-windows-getenv.patch`, seleccionado solo para esta integración Clang, que incluye `stdlib.h` en Windows y conserva la declaración anterior para otras plataformas. Pendiente de confirmar con la instalación completa.
+- `libflac` falló en Debug al compilar `getopt.c`: su declaración propia de `getenv` entra en conflicto con la declaración del runtime de Windows. Se añadió `clang-windows-getenv.patch`, seleccionado solo para esta integración Clang, que incluye `stdlib.h` en Windows y conserva la declaración anterior para otras plataformas. El reintento completó Debug y Release y superó la validación de vcpkg; hubo advertencias de PDB ausentes. Su funcionamiento en ejecución no se ha comprobado.
 
 - libjpeg-turbo 3.2.0 y Jasper 4.2.9 completaron la validación de vcpkg y se retiraron de la lista explícita de pendientes; ambas instalaciones produjeron advertencias de PDB.
 
