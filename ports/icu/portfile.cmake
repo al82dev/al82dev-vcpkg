@@ -25,6 +25,21 @@ vcpkg_extract_source_archive(SOURCE_PATH
         ${icu_clang_patches}
 )
 
+if(DEFINED VCPKG_CLANG_SDK_ROOT)
+    vcpkg_cmake_get_vars(icu_clang_vars)
+    include("${icu_clang_vars}")
+    set(icu_clang_linker "${VCPKG_DETECTED_CMAKE_LINKER}")
+    if(NOT EXISTS "${icu_clang_linker}")
+        message(FATAL_ERROR "Configured Clang linker not found: ${icu_clang_linker}")
+    endif()
+    # ICU probes the unrelated coreutils link command and its Windows make
+    # fragment hardcodes LINK.EXE. Use the configured LLVM linker for both.
+    vcpkg_replace_string("${SOURCE_PATH}/source/configure"
+        "link --version 2>&1" "\"${icu_clang_linker}\" --version 2>&1" IGNORE_UNCHANGED)
+    vcpkg_replace_string("${SOURCE_PATH}/source/config/mh-msys-msvc"
+        "LINK.EXE" "\"${icu_clang_linker}\"" IGNORE_UNCHANGED)
+endif()
+
 vcpkg_find_acquire_program(PYTHON3)
 set(ENV{PYTHON} "${PYTHON3}")
 
