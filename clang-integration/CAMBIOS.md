@@ -21,6 +21,18 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- libjpeg-turbo 3.2.0 y Jasper 4.2.9 completaron la validación de vcpkg y se retiraron de la lista explícita de pendientes; ambas instalaciones produjeron advertencias de PDB.
+
+- ImGui 1.93.0 con las características solicitadas y libspng 0.7.4 completaron la validación de vcpkg y se retiraron de la lista explícita. ImGui se empaquetó como biblioteca estática conforme a su port; no se ha probado su consumo en NativeSharp. libspng produjo advertencias de PDB.
+
+- SDL3 3.4.18 fue registrado por vcpkg con las características `dbus`, `libusb` y `vulkan`, completó Debug y Release y superó su validación usando `llvm-dlltool`. Sin embargo, su salida de configuración muestra `SDL_DBUS (Wanted: OFF): OFF`: el proyecto condiciona esa opción a sistemas Unix, por lo que DBus funcional en Windows no está implementado ni validado en esta instalación. Se pidió al usuario aclarar si necesita esa capacidad; la instalación del paquete se retiró de los siguientes comandos, sin dar por cumplida esa capacidad. Aparecieron advertencias por PDB y por la opción `SDL_UNIX_CONSOLE_BUILD`; el uso en ejecución sigue pendiente.
+
+- `sdl3[libusb]` falló al identificar la DLL de libusb porque buscaba `dumpbin`. Se verificó que `llvm-dlltool --identify` devuelve `libusb-1.0.dll`; el port ahora selecciona el `llvm-dlltool.exe` situado junto al Clang detectado cuando se usa libusb dinámico con esta integración. Mantiene activada la característica solicitada. Pendiente de validar la construcción de SDL3.
+
+- `libusb` 1.0.30 se compiló con el proyecto CMake de la integración y superó la validación de vcpkg en Debug y Release. Se retiró de la lista explícita para futuros intentos. El uso con dispositivos físicos y los triplets estáticos no se han verificado.
+
+- `libusb` 1.0.30 falló porque la receta de Windows intentó ejecutar `msbuild`, ausente y fuera de la cadena autorizada. Se añadió una construcción CMake para los triplets Clang, con las fuentes, el `config.h`, el archivo de exportaciones y el recurso usados por los proyectos Windows originales; las demás rutas conservan su comportamiento. La variante estándar no habilita hotplug de Windows, al igual que las configuraciones Debug y Release originales. Pendiente de validar compilación, exportaciones y uso.
+
 - ICU 79.1 completó Debug y Release y superó la validación de vcpkg con las correcciones de Clang y `pkgdata`. Vcpkg advirtió que faltan PDB para las DLL. No se ha certificado el consumo de su API C desde NativeSharp ni la compatibilidad binaria C++ de la clase interna modificada.
 
 - En el siguiente intento de ICU, vcpkg completó `all` e `install` de Debug con `lld-link` y `llvm-lib`, y comenzó Release. La instalación completa y la compatibilidad C++ siguen pendientes de verificación.
