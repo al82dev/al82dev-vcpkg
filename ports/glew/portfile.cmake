@@ -10,6 +10,11 @@ vcpkg_download_distfile(ARCHIVE
     SHA512 cb4caecf32ec0f180c2691dc7769ffc99571c64f259a2663a2b80e788f1c2fd5362c59e0caaeefed6fb78a4070366d244666a657358049b09071b59fae2377e0
 )
 
+set(clang_runtime_patches "")
+if(DEFINED VCPKG_CLANG_SDK_ROOT AND VCPKG_CRT_LINKAGE STREQUAL "dynamic" AND VCPKG_LIBRARY_LINKAGE STREQUAL "dynamic")
+    list(APPEND clang_runtime_patches clang-vcruntime.patch)
+endif()
+
 vcpkg_extract_source_archive(
     SOURCE_PATH
     ARCHIVE "${ARCHIVE}"
@@ -17,6 +22,7 @@ vcpkg_extract_source_archive(
     PATCHES
         fix-LNK2019.patch
         trim-build.diff
+        ${clang_runtime_patches}
 )
 
 set(options "")

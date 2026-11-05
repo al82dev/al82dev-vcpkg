@@ -1,0 +1,13 @@
+--- a/build/cmake/CMakeLists.txt
++++ b/build/cmake/CMakeLists.txt
+@@ -154,6 +154,10 @@
+ endif()
+ 
+ target_link_libraries (glew LINK_PUBLIC ${GLEW_LIBRARIES})
++target_link_libraries (glew LINK_PRIVATE
++  "$<$<CONFIG:Debug>:vcruntimed.lib>"
++  "$<$<NOT:$<CONFIG:Debug>>:vcruntime.lib>"
++)
+ target_link_libraries (glew_s ${GLEW_LIBRARIES})
+ 
+ target_compile_definitions(glew_s INTERFACE "GLEW_STATIC")
