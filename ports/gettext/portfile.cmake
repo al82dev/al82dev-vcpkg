@@ -20,6 +20,11 @@ vcpkg_download_distfile(ARCHIVE
     SHA512 d8b22d7fba10052a2045f477f0a5b684d932513bdb3b295c22fbd9dfc2a9d8fccd9aefd90692136c62897149aa2f7d1145ce6618aa1f0be787cb88eba5bc09be
 )
 
+set(clang_gettext_patches "")
+if(DEFINED VCPKG_CLANG_SDK_ROOT)
+    list(APPEND clang_gettext_patches clang-iconv-flush-signature.patch)
+endif()
+
 vcpkg_extract_source_archive(SOURCE_PATH
     ARCHIVE "${ARCHIVE}"
     PATCHES
@@ -31,6 +36,7 @@ vcpkg_extract_source_archive(SOURCE_PATH
         config-step-order.patch
         0001-xgettext-Fix-some-test-failures-on-MSVC.patch
         env.patch # https://cgit.git.savannah.gnu.org/cgit/gnulib.git/commit/lib/localtime.c?id=92cdf62b56462b914193c7770440e505a37c2526
+        ${clang_gettext_patches}
 )
 
 set(subdirs "")
