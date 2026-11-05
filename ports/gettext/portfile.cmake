@@ -155,6 +155,17 @@ if(subdirs)
         # libtool must extract members of convenience archives; llvm-lib does
         # not implement the extraction operation required by ar-lib.
         list(APPEND OPTIONS "AR=${clang_gettext_ar}" "ARFLAGS=cr")
+        # Automake's compile wrapper does not recognize clang-cl.exe and therefore
+        # passes -liconv unchanged to clang-cl during configure checks. Patch a
+        # port-local copy; never modify the user's MSYS2 installation.
+        set(clang_gettext_wrapper_dir "${CURRENT_BUILDTREES_DIR}/clang-automake-wrapper")
+        file(MAKE_DIRECTORY "${clang_gettext_wrapper_dir}")
+        configure_file("${_clang_msys_root}/usr/share/automake-1.16/compile"
+            "${clang_gettext_wrapper_dir}/compile" COPYONLY)
+        vcpkg_replace_string("${clang_gettext_wrapper_dir}/compile"
+            [[  cl | *[/\\]cl | cl.exe | *[/\\]cl.exe |]]
+            [[  clang-cl | *[/\\]clang-cl | clang-cl.exe | *[/\\]clang-cl.exe | cl | *[/\\]cl | cl.exe | *[/\\]cl.exe |]])
+        vcpkg_add_to_path(PREPEND "${clang_gettext_wrapper_dir}")
     endif()
 
     file(REMOVE "${CURRENT_BUILDTREES_DIR}/config.cache-${TARGET_TRIPLET}-rel.log")
