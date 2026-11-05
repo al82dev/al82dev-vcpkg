@@ -27,6 +27,17 @@ vcpkg_check_features(
 
 string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "dynamic" BUILD_SHARED)
 
+if(VCPKG_TARGET_IS_WINDOWS AND DEFINED VCPKG_CLANG_SDK_ROOT AND BUILD_SHARED AND "libxmp" IN_LIST FEATURES)
+    vcpkg_cmake_get_vars(sdl3_mixer_clang_vars)
+    include("${sdl3_mixer_clang_vars}")
+    cmake_path(GET VCPKG_DETECTED_CMAKE_C_COMPILER PARENT_PATH sdl3_mixer_clang_bin)
+    set(sdl3_mixer_dlltool "${sdl3_mixer_clang_bin}/llvm-dlltool.exe")
+    if(NOT EXISTS "${sdl3_mixer_dlltool}")
+        message(FATAL_ERROR "Configured LLVM dlltool not found: ${sdl3_mixer_dlltool}")
+    endif()
+    vcpkg_list(APPEND EXTRA_OPTIONS "-DCMAKE_DLLTOOL=${sdl3_mixer_dlltool}")
+endif()
+
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS

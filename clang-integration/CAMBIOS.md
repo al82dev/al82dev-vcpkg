@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- WavPack completó Debug y Release y superó la validación con las optimizaciones MASM ensambladas por `llvm-ml64`; hubo advertencia de PDB y no se ha probado su uso en ejecución. SDL3 Mixer se detuvo al buscar `dumpbin` para `libxmp` dinámico; se configuró el `llvm-dlltool` adyacente a Clang, como en SDL3. Pendiente de validar SDL3 Mixer.
+
 - El siguiente intento de WavPack invocó `llvm-ml64`, que rechazó `proc public frame` y las directivas de pila asociadas. En un reproductor pequeño se verificó que `public nombre` seguido de `nombre proc frame` genera símbolo público y datos de desenrollado COFF; un segundo parche aplica esa sintaxis a las seis funciones afectadas. La biblioteca completa aún no está validada.
 
 - ReactPhysics3D se instaló como biblioteca estática conforme a su port; `sdl3-image` con las características solicitadas pasó la validación de vcpkg. WavPack falló porque CMake asignó sus archivos MASM a `clang-cl` en vez de `llvm-ml64`. El primer parche marcó esos archivos como `ASM_MASM`, pero CMake informó que el lenguaje no estaba habilitado; el parche ahora también lo habilita, sin desactivar la optimización. Pendiente de comprobar su compilación.
