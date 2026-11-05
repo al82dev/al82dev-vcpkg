@@ -5,7 +5,7 @@ if (VCPKG_TARGET_IS_ANDROID OR VCPKG_TARGET_IS_MINGW)
 endif()
 
 if(VCPKG_TARGET_IS_WINDOWS AND DEFINED VCPKG_CLANG_SDK_ROOT)
-    vcpkg_list(APPEND PATCHES "clang-masm-language.patch")
+    vcpkg_list(APPEND PATCHES "clang-masm-language.patch" "clang-frame-syntax.patch")
 endif()
 
 vcpkg_from_github(

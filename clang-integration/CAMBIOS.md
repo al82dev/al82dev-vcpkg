@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- El siguiente intento de WavPack invocó `llvm-ml64`, que rechazó `proc public frame` y las directivas de pila asociadas. En un reproductor pequeño se verificó que `public nombre` seguido de `nombre proc frame` genera símbolo público y datos de desenrollado COFF; un segundo parche aplica esa sintaxis a las seis funciones afectadas. La biblioteca completa aún no está validada.
+
 - ReactPhysics3D se instaló como biblioteca estática conforme a su port; `sdl3-image` con las características solicitadas pasó la validación de vcpkg. WavPack falló porque CMake asignó sus archivos MASM a `clang-cl` en vez de `llvm-ml64`. El primer parche marcó esos archivos como `ASM_MASM`, pero CMake informó que el lenguaje no estaba habilitado; el parche ahora también lo habilita, sin desactivar la optimización. Pendiente de comprobar su compilación.
 
 - Por indicación del usuario, se detuvo la instalación durante la configuración de `qtbase` y se retiró Qt de la lista de paquetes y del comando pendiente. `vcpkg list qtbase` no mostró una instalación registrada; las demás bibliotecas instaladas se conservan. La tarea general permanece pausada.
