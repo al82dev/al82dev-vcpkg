@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- Shader Slang: el intento del port llegó al generador `slang-bootstrap`, que terminó con `0xC0000135`. Sus importaciones muestran que la DLL interna de Slang dependía de `miniz.dll`, generada fuera del directorio del ejecutable. El helper de vcpkg había activado `BUILD_SHARED_LIBS`; se establece `OFF` para la configuración Release mediante `OPTIONS_RELEASE` y se conserva `SLANG_LIB_TYPE=SHARED`, como en el diagnóstico aislado. Reintento pendiente de resultado.
+
 - Shader Slang: la primera configuración del port desde fuentes falló al asignar propiedades a `slang-rhi-tests` cuando las pruebas estaban desactivadas. El parche comprueba que exista ese destino antes de configurarlo. El registro también mostró que `FETCHCONTENT_FULLY_DISCONNECTED` impedía localizar DXC y otros componentes que upstream obtiene durante la configuración; el port permite su descarga, como en el diagnóstico aislado. Estos componentes externos incluyen binarios precompilados y no son el compilador C/C++ usado para construir el port. Reintento de instalación en curso; todavía no se declara éxito.
 
 - La copia auxiliar LLVM `/MD` completó su instalación; conserva las siete arquitecturas configuradas y no incluye DIA. El diagnóstico de Slang enlazó `slang-llvm.dll`, generó LLVM IR con los valores esperados de la prueba upstream `tests/llvm/printf.slang` y aprobó `uint16-structured-buffer.cpu` (12 aserciones). La ruta CPU solicita `host-callable`, que Slang dirige preferentemente a LLVM si está disponible. Esto no certifica todos los modos de punto flotante ni la equivalencia de DIA.

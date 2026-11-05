@@ -61,6 +61,7 @@ vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         -DFETCHCONTENT_FULLY_DISCONNECTED=OFF
+        -DSLANG_LIB_TYPE=SHARED
         -DSLANG_ENABLE_TESTS=OFF
         -DSLANG_ENABLE_EXAMPLES=OFF
         -DSLANG_SLANG_LLVM_FLAVOR=USE_SYSTEM_LLVM
@@ -68,6 +69,8 @@ vcpkg_cmake_configure(
         "-DClang_DIR=${_clang_llvm_md}/lib/cmake/clang"
         "-DSLANG_CLANG_ZSTD_DIR=${_clang_zstd}"
         "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_LIST_DIR}/clang-project-include.cmake"
+    OPTIONS_RELEASE
+        -DBUILD_SHARED_LIBS=OFF
 )
 vcpkg_cmake_build(TARGET copy-gfx-slang-modules)
 vcpkg_cmake_install()
