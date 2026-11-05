@@ -21,7 +21,7 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
-- OpenSSL se detuvo antes de configurar porque su helper exige `nmake`. Para el toolchain independiente se intenta usar `jom`, auxiliar compatible con makefiles de NMake que vcpkg puede obtener; la receta sigue pasando explícitamente el compilador, enlazador y archivador LLVM detectados. Cambio pendiente de comprobar con la construcción completa.
+- OpenSSL se detuvo antes de configurar porque su helper exige `nmake`. Para el toolchain independiente se usa `jom`, auxiliar compatible con makefiles de NMake que vcpkg obtiene; la receta sigue pasando explícitamente el compilador, enlazador y archivador LLVM detectados. El reintento completó Debug y Release y pasó la validación de vcpkg; hubo advertencia de PDB. El funcionamiento criptográfico en ejecución no se ha probado.
 
 - `libgeotiff` falló con `-D/DW4`, porque su CMake pasa `/DW4` a `target_compile_definitions`. Para esta integración se reemplazó por `W4`, conservando la definición con la sintaxis que espera CMake. El reintento completó Debug y Release y pasó la validación, con advertencia de PDB. Después se trasladó el mismo cambio a un parche aplicado al extraer fuentes para hacerlo repetible con `--editable`; esta última presentación del cambio está pendiente de volver a compilarse.
 
