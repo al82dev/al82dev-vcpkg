@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- Shader Slang estático se instaló y un consumidor CMake enlazó y ejecutó en Debug y Release; los archivos indican `MTd_StaticDebug` y `MT_StaticRelease`. La prueba LLVM Release produjo el IR esperado. La herramienta Debug no encontraba el backend LLVM por sí sola, pero sí al añadir al PATH el directorio de herramientas Release; la receta ahora copia ese módulo Release, compilado con CRT estático, junto a las herramientas Debug. También elimina cabeceras y documentación Debug duplicadas y dos directorios vacíos señalados por vcpkg. Correcciones pendientes de reinstalación y validación.
+
 - DBus se instaló en Debug y Release; vcpkg advirtió que quedaba `debug/bin/dbus-env.bat`. Ese archivo conservaba la ruta temporal `packages/.../debug`. La receta lo mueve a `debug/tools/dbus`, como las herramientas Debug, y sustituye la ruta por una relativa. Corrección pendiente de reinstalación y validación.
 
 - Validación intermedia de la campaña estática: `libavif[aom,dav1d]` completó Debug y Release después del parche; `llvm-ar t` confirmó que `avif.lib` contiene objetos compilados. `proj` falló una vez sin dejar contenido en sus registros de configuración; un reintento sin modificar el port completó Debug y Release con directivas `MTd_StaticDebug` y `MT_StaticRelease`. En una prueba aislada, la adaptación de DBus generó `dbus-1.lib`; `dbus-daemon --version` ejecutó y sus importaciones visibles fueron DLL del sistema. Falta instalar y probar DBus mediante vcpkg.

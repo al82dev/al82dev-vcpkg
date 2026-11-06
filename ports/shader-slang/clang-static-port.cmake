@@ -83,6 +83,12 @@ vcpkg_cmake_config_fixup(CONFIG_PATH cmake PACKAGE_NAME slang)
 file(MAKE_DIRECTORY "${CURRENT_PACKAGES_DIR}/tools" "${CURRENT_PACKAGES_DIR}/debug/tools")
 file(RENAME "${CURRENT_PACKAGES_DIR}/bin" "${CURRENT_PACKAGES_DIR}/tools/${PORT}")
 file(RENAME "${CURRENT_PACKAGES_DIR}/debug/bin" "${CURRENT_PACKAGES_DIR}/debug/tools/${PORT}")
+file(COPY "${CURRENT_PACKAGES_DIR}/tools/${PORT}/slang-llvm.dll"
+    DESTINATION "${CURRENT_PACKAGES_DIR}/debug/tools/${PORT}")
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include" "${CURRENT_PACKAGES_DIR}/debug/share")
+file(REMOVE_RECURSE
+    "${CURRENT_PACKAGES_DIR}/share/doc/slang/generated/tests/_meta/remediations"
+    "${CURRENT_PACKAGES_DIR}/share/doc/slang/generated/tests/_meta/reviews")
 foreach(_clang_cfg IN ITEMS release debug)
     vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/share/slang/slangTargets-${_clang_cfg}.cmake"
         "\${_IMPORT_PREFIX}/debug/bin/" "\${_IMPORT_PREFIX}/debug/tools/${PORT}/" IGNORE_UNCHANGED)
