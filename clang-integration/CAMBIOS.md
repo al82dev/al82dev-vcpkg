@@ -21,6 +21,8 @@ Este registro conserva el motivo y el estado de los cambios de la integración. 
 
 ## Evidencia y correcciones
 
+- `slang::gfx` estático falló al enlazar un consumidor con símbolos `cu*` sin resolver. Los registros de Debug y Release mostraron `SLANG_ENABLE_CUDA=TRUE`, pero la exportación upstream omitía `CUDA::cuda_driver`. La receta registra la capacidad detectada y la interfaz de `gfx` localiza y enlaza ese objetivo cuando corresponde. Se actualizó el `slangConfig.cmake` existente tanto en el paquete instalado como en su copia de staging, sin reconstruir los binarios; un consumidor que enlaza únicamente `slang::gfx` compiló y ejecutó en Debug y Release. Los consumidores de esta variante de `gfx` necesitan el SDK CUDA detectado durante la construcción; no se empleó su compilador para construir los paquetes.
+
 - Shader Slang estático se instaló y un consumidor CMake enlazó y ejecutó en Debug y Release; los archivos indican `MTd_StaticDebug` y `MT_StaticRelease`. La prueba LLVM Release produjo el IR esperado. La herramienta Debug no encontraba el backend LLVM por sí sola, pero sí al añadir al PATH el directorio de herramientas Release; la receta ahora copia ese módulo Release, compilado con CRT estático, junto a las herramientas Debug. También elimina cabeceras y documentación Debug duplicadas y dos directorios vacíos señalados por vcpkg. Correcciones pendientes de reinstalación y validación.
 
 - DBus se instaló en Debug y Release; vcpkg advirtió que quedaba `debug/bin/dbus-env.bat`. Ese archivo conservaba la ruta temporal `packages/.../debug`. La receta lo mueve a `debug/tools/dbus`, como las herramientas Debug, y sustituye la ruta por una relativa. Corrección pendiente de reinstalación y validación.
