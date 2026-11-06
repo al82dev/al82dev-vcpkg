@@ -104,4 +104,13 @@ if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "debug")
 endif()
 vcpkg_copy_tools(TOOL_NAMES ${TOOLS} AUTO_CLEAN)
 
+if(_clang_dbus_static AND EXISTS "${CURRENT_PACKAGES_DIR}/debug/bin/dbus-env.bat")
+    file(MAKE_DIRECTORY "${CURRENT_PACKAGES_DIR}/debug/tools/${PORT}")
+    file(RENAME "${CURRENT_PACKAGES_DIR}/debug/bin/dbus-env.bat"
+        "${CURRENT_PACKAGES_DIR}/debug/tools/${PORT}/dbus-env.bat")
+    vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/debug/tools/${PORT}/dbus-env.bat"
+        "${CURRENT_PACKAGES_DIR}/debug" "%~dp0/../..")
+    file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/bin")
+endif()
+
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/COPYING")
