@@ -1,3 +1,8 @@
+set(clang_patches)
+if(VCPKG_TARGET_IS_WINDOWS AND DEFINED VCPKG_CLANG_SDK_ROOT)
+    list(APPEND clang_patches clang-windows-getenv.patch)
+endif()
+
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO xiph/flac
@@ -8,6 +13,7 @@ vcpkg_from_github(
         android-cmake.diff
         fix-compile-options.patch
         fix-find-threads.patch
+        ${clang_patches}
 )
 
 if("asm" IN_LIST FEATURES)

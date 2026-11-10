@@ -7,6 +7,11 @@
   "supports": "!uwp",
   "dependencies": [
     {
+      "name": "vcpkg-cmake",
+      "host": true,
+      "platform": "windows & !mingw"
+    },
+    {
       "name": "vcpkg-make",
       "host": true,
       "platform": "!windows | mingw"

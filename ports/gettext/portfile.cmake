@@ -20,6 +20,11 @@ vcpkg_download_distfile(ARCHIVE
     SHA512 d8b22d7fba10052a2045f477f0a5b684d932513bdb3b295c22fbd9dfc2a9d8fccd9aefd90692136c62897149aa2f7d1145ce6618aa1f0be787cb88eba5bc09be
 )
 
+set(clang_gettext_patches "")
+if(DEFINED VCPKG_CLANG_SDK_ROOT)
+    list(APPEND clang_gettext_patches clang-iconv-flush-signature.patch clang-po-lex-attributes.patch)
+endif()
+
 vcpkg_extract_source_archive(SOURCE_PATH
     ARCHIVE "${ARCHIVE}"
     PATCHES
@@ -31,6 +36,7 @@ vcpkg_extract_source_archive(SOURCE_PATH
         config-step-order.patch
         0001-xgettext-Fix-some-test-failures-on-MSVC.patch
         env.patch # https://cgit.git.savannah.gnu.org/cgit/gnulib.git/commit/lib/localtime.c?id=92cdf62b56462b914193c7770440e505a37c2526
+        ${clang_gettext_patches}
 )
 
 set(subdirs "")
@@ -139,6 +145,27 @@ if(subdirs)
                 gt_cv_int_divbyzero_sigfpe=no
             )
         endif()
+    endif()
+
+    if(DEFINED VCPKG_CLANG_SDK_ROOT)
+        set(clang_gettext_ar "${_clang_msys_root}/clang64/bin/llvm-ar.exe")
+        if(NOT EXISTS "${clang_gettext_ar}")
+            message(FATAL_ERROR "CLANG64 llvm-ar not found: ${clang_gettext_ar}")
+        endif()
+        # libtool must extract members of convenience archives; llvm-lib does
+        # not implement the extraction operation required by ar-lib.
+        list(APPEND OPTIONS "AR=${clang_gettext_ar}" "ARFLAGS=cr")
+        # Automake's compile wrapper does not recognize clang-cl.exe and therefore
+        # passes -liconv unchanged to clang-cl during configure checks. Patch a
+        # port-local copy; never modify the user's MSYS2 installation.
+        set(clang_gettext_wrapper_dir "${CURRENT_BUILDTREES_DIR}/clang-automake-wrapper")
+        file(MAKE_DIRECTORY "${clang_gettext_wrapper_dir}")
+        configure_file("${_clang_msys_root}/usr/share/automake-1.16/compile"
+            "${clang_gettext_wrapper_dir}/compile" COPYONLY)
+        vcpkg_replace_string("${clang_gettext_wrapper_dir}/compile"
+            [[  cl | *[/\\]cl | cl.exe | *[/\\]cl.exe |]]
+            [[  clang-cl | *[/\\]clang-cl | clang-cl.exe | *[/\\]clang-cl.exe | cl | *[/\\]cl | cl.exe | *[/\\]cl.exe |]])
+        vcpkg_add_to_path(PREPEND "${clang_gettext_wrapper_dir}")
     endif()
 
     file(REMOVE "${CURRENT_BUILDTREES_DIR}/config.cache-${TARGET_TRIPLET}-rel.log")

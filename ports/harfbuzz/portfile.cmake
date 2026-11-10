@@ -108,6 +108,11 @@ if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
 endif()
 
 set(LANGUAGES C CXX)
+if(DEFINED VCPKG_CLANG_SDK_ROOT)
+    # Meson's clang-cl /clang:-std=c++11 overrides HarfBuzz's /std:c++14.
+    # Select C++17 in Meson itself, also satisfying the port's ICU >= 75 path.
+    list(APPEND OPTIONS -Dcpp_std=c++17)
+endif()
 if(VCPKG_TARGET_IS_APPLE)
     list(APPEND LANGUAGES OBJC OBJCXX)
 endif()

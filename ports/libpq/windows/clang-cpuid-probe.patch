@@ -1,0 +1,20 @@
+--- a/meson.build
++++ b/meson.build
+@@ -2017,7 +2017,7 @@
+ endif
+ 
+ # Check for __get_cpuid() and __cpuid().
+-if cc.links('''
++if cc.get_id() != 'clang-cl' and cc.links('''
+     #include <cpuid.h>
+     int main(int arg, char **argv)
+     {
+@@ -2041,7 +2041,7 @@
+ 
+ 
+ # Check for __get_cpuid_count() and __cpuidex() in a similar fashion.
+-if cc.links('''
++if cc.get_id() != 'clang-cl' and cc.links('''
+     #include <cpuid.h>
+     int main(int arg, char **argv)
+     {

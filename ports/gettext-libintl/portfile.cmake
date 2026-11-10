@@ -89,12 +89,26 @@ if(VCPKG_TARGET_IS_WINDOWS)
     endif()
 endif()
 
+set(clang_archive_options "")
+if(DEFINED VCPKG_CLANG_SDK_ROOT)
+    set(clang_llvm_ar "${_clang_msys_root}/clang64/bin/llvm-ar.exe")
+    if(NOT EXISTS "${clang_llvm_ar}")
+        message(FATAL_ERROR "CLANG64 llvm-ar not found: ${clang_llvm_ar}")
+    endif()
+    # llvm-lib lacks /EXTRACT, which libtool needs when combining convenience archives.
+    # Keep the compiler and CMake's archiver unchanged; only this port uses llvm-ar.
+    set(ENV{AR} "${clang_llvm_ar}")
+    set(ENV{ARFLAGS} "cr")
+    list(APPEND clang_archive_options "ARFLAGS=cr")
+endif()
+
 file(REMOVE "${CURRENT_BUILDTREES_DIR}/config.cache-${TARGET_TRIPLET}-rel.log")
 file(REMOVE "${CURRENT_BUILDTREES_DIR}/config.cache-${TARGET_TRIPLET}-dbg.log")
 vcpkg_make_configure(
     SOURCE_PATH "${SOURCE_PATH}/gettext-runtime/intl"
     OPTIONS
         ${OPTIONS}
+        ${clang_archive_options}
     OPTIONS_RELEASE
         "--cache-file=${CURRENT_BUILDTREES_DIR}/config.cache-${TARGET_TRIPLET}-rel.log"
     OPTIONS_DEBUG
@@ -116,7 +130,7 @@ foreach(file IN LISTS makefiles)
     file(WRITE "${file}" "${rules}")
 endforeach()
 
-vcpkg_make_install()
+vcpkg_make_install(OPTIONS ${clang_archive_options})
 vcpkg_copy_pdbs()
 
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share")

@@ -5,6 +5,11 @@ vcpkg_download_distfile(
     SHA512 04A49455E1489030C520A4BFD2664FA2171E7938D08F2ACDBBCB1FDA976639FD8B1F0704F2EEC89BA59A7B6D118CEAAB6EC5A096E40D9085A0895D91CE225245
 )
 
+set(icu_clang_patches "")
+if(DEFINED VCPKG_CLANG_SDK_ROOT)
+    list(APPEND icu_clang_patches clang-ecliptic-assignment.patch)
+endif()
+
 vcpkg_extract_source_archive(SOURCE_PATH
     ARCHIVE "${ARCHIVE}"
     PATCHES
@@ -18,7 +23,29 @@ vcpkg_extract_source_archive(SOURCE_PATH
         mh-msys-msvc.patch
         subdirs.patch
         vcpkg-cross-data.patch
+        ${icu_clang_patches}
 )
+
+if(DEFINED VCPKG_CLANG_SDK_ROOT)
+    vcpkg_cmake_get_vars(icu_clang_vars)
+    include("${icu_clang_vars}")
+    set(icu_clang_linker "${VCPKG_DETECTED_CMAKE_LINKER}")
+    if(NOT EXISTS "${icu_clang_linker}")
+        message(FATAL_ERROR "Configured Clang linker not found: ${icu_clang_linker}")
+    endif()
+    # ICU probes the unrelated coreutils link command and its Windows make
+    # fragment hardcodes LINK.EXE. Use the configured LLVM linker for both.
+    vcpkg_replace_string("${SOURCE_PATH}/source/configure"
+        "link --version 2>&1" "\"${icu_clang_linker}\" --version 2>&1" IGNORE_UNCHANGED)
+    vcpkg_replace_string("${SOURCE_PATH}/source/config/mh-msys-msvc"
+        "LINK.EXE" "\"${icu_clang_linker}\"" IGNORE_UNCHANGED)
+    # pkgdata launches its own linker command independently of the make rules.
+    # The Clang launcher puts the configured LLVM bin directory first on PATH.
+    vcpkg_replace_string("${SOURCE_PATH}/source/tools/pkgdata/pkgdata.cpp"
+        "link.exe /nologo /release /out:" "lld-link.exe /nologo /release /out:" IGNORE_UNCHANGED)
+    vcpkg_replace_string("${SOURCE_PATH}/source/tools/pkgdata/pkgdata.cpp"
+        "LIB.exe /nologo /out:" "llvm-lib.exe /nologo /out:" IGNORE_UNCHANGED)
+endif()
 
 vcpkg_find_acquire_program(PYTHON3)
 set(ENV{PYTHON} "${PYTHON3}")

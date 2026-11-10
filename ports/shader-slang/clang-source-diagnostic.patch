@@ -1,0 +1,153 @@
+diff --git a/cmake/RegenerateDllExports.cmake b/cmake/RegenerateDllExports.cmake
+index 6442bce..72e92cc 100644
+--- a/cmake/RegenerateDllExports.cmake
++++ b/cmake/RegenerateDllExports.cmake
+@@ -27,6 +27,55 @@ if(NOT EXISTS "${DLL_PATH}")
+     message(FATAL_ERROR "DLL not found: ${DLL_PATH}")
+ endif()
+ 
++find_program(LLVM_READOBJ_EXECUTABLE llvm-readobj)
++if(LLVM_READOBJ_EXECUTABLE)
++    execute_process(
++        COMMAND "${LLVM_READOBJ_EXECUTABLE}" --sections --coff-exports "${DLL_PATH}"
++        OUTPUT_VARIABLE LLVM_OUTPUT ERROR_VARIABLE LLVM_ERROR RESULT_VARIABLE LLVM_RESULT
++    )
++    if(NOT LLVM_RESULT EQUAL 0)
++        message(FATAL_ERROR "llvm-readobj failed: ${LLVM_ERROR}")
++    endif()
++    string(REGEX MATCHALL "Section \\{[^}]*\\}" SECTIONS "${LLVM_OUTPUT}")
++    set(EXECUTABLE_RANGES "")
++    foreach(SECTION IN LISTS SECTIONS)
++        if(SECTION MATCHES "IMAGE_SCN_MEM_EXECUTE")
++            string(REGEX MATCH "VirtualAddress: (0x[0-9A-Fa-f]+)" _ "${SECTION}")
++            set(START "${CMAKE_MATCH_1}")
++            string(REGEX MATCH "VirtualSize: (0x[0-9A-Fa-f]+)" _ "${SECTION}")
++            math(EXPR END "${START} + ${CMAKE_MATCH_1}")
++            list(APPEND EXECUTABLE_RANGES "${START},${END}")
++        endif()
++    endforeach()
++    string(REGEX MATCHALL "Export \\{[^}]*\\}" EXPORTS "${LLVM_OUTPUT}")
++    set(DEF_CONTENT "LIBRARY slang\nEXPORTS\n")
++    set(NUM_EXPORTS 0)
++    foreach(EXPORT IN LISTS EXPORTS)
++        string(REGEX MATCH "Name: ([^\r\n]+)" _ "${EXPORT}")
++        set(FUNC "${CMAKE_MATCH_1}")
++        string(REGEX MATCH "RVA: (0x[0-9A-Fa-f]+)" _ "${EXPORT}")
++        set(RVA "${CMAKE_MATCH_1}")
++        if(FUNC AND RVA)
++            foreach(RANGE IN LISTS EXECUTABLE_RANGES)
++                string(REPLACE "," ";" BOUNDS "${RANGE}")
++                list(GET BOUNDS 0 START)
++                list(GET BOUNDS 1 END)
++                if(RVA GREATER_EQUAL START AND RVA LESS END)
++                    string(APPEND DEF_CONTENT "    ${FUNC} = ${TARGET_DLL_NAME}.${FUNC}\n")
++                    math(EXPR NUM_EXPORTS "${NUM_EXPORTS} + 1")
++                    break()
++                endif()
++            endforeach()
++        endif()
++    endforeach()
++    if(NUM_EXPORTS EQUAL 0)
++        message(FATAL_ERROR "No executable exports found in ${DLL_PATH}")
++    endif()
++    file(WRITE "${OUTPUT_DEF}" "${DEF_CONTENT}")
++    message(STATUS "Generated ${OUTPUT_DEF} with ${NUM_EXPORTS} executable exports using llvm-readobj")
++    return()
++endif()
++
+ # Find dumpbin - should be available in Visual Studio environment
+ find_program(DUMPBIN_EXECUTABLE dumpbin)
+ if(NOT DUMPBIN_EXECUTABLE)
+diff --git a/external/CMakeLists.txt b/external/CMakeLists.txt
+index 879c065..63025b2 100644
+--- a/external/CMakeLists.txt
++++ b/external/CMakeLists.txt
+@@ -402,7 +402,7 @@ endif()
+ # slang-rhi
+ if(SLANG_ENABLE_SLANG_RHI)
+     set(SLANG_RHI_BUILD_FROM_SLANG_REPO ON)
+-    set(SLANG_RHI_BUILD_TESTS ON)
++    set(SLANG_RHI_BUILD_TESTS ${SLANG_ENABLE_TESTS})
+     set(SLANG_RHI_BUILD_TESTS_WITH_GLFW OFF)
+     set(SLANG_RHI_INSTALL OFF)
+     set(SLANG_RHI_BINARY_DIR ${slang_BINARY_DIR}/$<CONFIG>/bin)
+@@ -446,10 +446,12 @@ if(SLANG_ENABLE_SLANG_RHI)
+     endif()
+ 
+     # Output slang-rhi-tests to the bin directory so we can run it easily.
+-    set_target_properties(
+-        slang-rhi-tests
+-        PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${slang_BINARY_DIR}/$<CONFIG>/bin
+-    )
++    if(TARGET slang-rhi-tests)
++        set_target_properties(
++            slang-rhi-tests
++            PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${slang_BINARY_DIR}/$<CONFIG>/bin
++        )
++    endif()
+ endif()
+ 
+ # Tidy things up:
+diff --git a/source/slang-llvm/slang-llvm-builder.cpp b/source/slang-llvm/slang-llvm-builder.cpp
+index a29e75e..0a49f2e 100644
+--- a/source/slang-llvm/slang-llvm-builder.cpp
++++ b/source/slang-llvm/slang-llvm-builder.cpp
+@@ -468,12 +468,16 @@ LLVMBuilder::LLVMBuilder(LLVMBuilderOptions options, IArtifact** outErrorArtifac
+         break;
+     case SLANG_FLOATING_POINT_MODE_FAST:
+         opt.HonorSignDependentRoundingFPMathOption = 0;
++#if LLVM_VERSION_MAJOR < 23
+         opt.NoSignedZerosFPMath = 1;
++#endif
+         break;
+     case SLANG_FLOATING_POINT_MODE_PRECISE:
++#if LLVM_VERSION_MAJOR < 23
+         opt.NoInfsFPMath = 0;
+         opt.NoNaNsFPMath = 0;
+         opt.NoSignedZerosFPMath = 0;
++#endif
+         break;
+     }
+ 
+@@ -615,6 +619,10 @@ void LLVMBuilder::addFPModeFlags()
+ 
+     for (llvm::Function& F : *llvmModule)
+     {
++#if LLVM_VERSION_MAJOR >= 23
++        if (options.fpMode == SLANG_FLOATING_POINT_MODE_FAST)
++            F.addFnAttr("no-signed-zeros-fp-math", "true");
++#endif
+         if (options.fpMode == SLANG_FLOATING_POINT_MODE_PRECISE)
+             F.addFnAttr(llvm::Attribute::AttrKind::StrictFP);
+ 
+diff --git a/source/slang-llvm/slang-llvm-jit-shared-library.cpp b/source/slang-llvm/slang-llvm-jit-shared-library.cpp
+index 2b23276..9c5056e 100644
+--- a/source/slang-llvm/slang-llvm-jit-shared-library.cpp
++++ b/source/slang-llvm/slang-llvm-jit-shared-library.cpp
+@@ -22,13 +22,6 @@ namespace slang_llvm
+ namespace
+ {
+ 
+-// TODO: LLVM 23 switches LLJIT's default object layer from RuntimeDyld to JITLink, whose
+-// InProcessMemoryManager should not need this Windows SectionMemoryManager workaround.
+-static_assert(
+-    LLVM_VERSION_MAJOR < 23,
+-    "Remove OrderedRTDyldMemoryManager when upgrading to LLVM 23 or later; LLJIT uses JITLink's "
+-    "InProcessMemoryManager by default");
+-
+ // Places each JIT object's code, read-only data, and writable data in one contiguous mapping in
+ // that order. This keeps every COFF ADDR32NB target at a non-negative 32-bit offset from the
+ // object's image base.
+@@ -273,7 +266,11 @@ static void configureRTDyldForWindows64(llvm::orc::LLJITBuilder& jitBuilder)
+     // Keep RuntimeDyld's established COFF behavior, but give each object one contiguous allocation
+     // in the order required by its relocation model: code, read-only data, then writable data.
+     jitBuilder.setObjectLinkingLayerCreator(
+-        [](llvm::orc::ExecutionSession& executionSession)
++        [](llvm::orc::ExecutionSession& executionSession
++#if LLVM_VERSION_MAJOR >= 23
++           , llvm::jitlink::JITLinkMemoryManager&
++#endif
++           )
+             -> llvm::Expected<std::unique_ptr<llvm::orc::ObjectLayer>>
+         {
+             auto getMemoryManager = [](const llvm::MemoryBuffer&)

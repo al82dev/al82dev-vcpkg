@@ -18,7 +18,11 @@ file(REMOVE_RECURSE ${third_party})
 
 vcpkg_list(SET OPTIONS)
 if(VCPKG_TARGET_IS_WINDOWS)
-    vcpkg_acquire_msys(MSYS_ROOT
+    if(DEFINED VCPKG_CLANG_SDK_ROOT)
+        # The Clang integration uses the user's existing MSYS2 installation.
+        vcpkg_acquire_msys(MSYS_ROOT PACKAGES bash util-linux dos2unix)
+    else()
+        vcpkg_acquire_msys(MSYS_ROOT
         PACKAGES
             bash
         DIRECT_PACKAGES
@@ -28,7 +32,8 @@ if(VCPKG_TARGET_IS_WINDOWS)
             # Required for "dos2unix"
             "https://mirror.msys2.org/msys/x86_64/dos2unix-7.5.2-1-x86_64.pkg.tar.zst"
             e5e949f01b19c82630131e338a4642da75e42f84220f5af4a97a11dd618e363396567b233d2adab79e05422660a0000abcbbabcd17efcadf37f07fe7565f041e
-    )
+        )
+    endif()
     vcpkg_add_to_path("${MSYS_ROOT}/usr/bin")
     vcpkg_list(APPEND OPTIONS "-DBASH_EXECUTABLE=${MSYS_ROOT}/usr/bin/bash.exe")
 endif()

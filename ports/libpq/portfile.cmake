@@ -5,6 +5,12 @@ vcpkg_download_distfile(ARCHIVE
     SHA512 1a7606b5b2460a4fc817d491e1e03262df17ece6869fa3d2b80647baffcfb790fbcfa019c3b10fab9f9a14218651b6a358864e40a5d8c5ddc796db2d6e5b469c
 )
 
+set(clang_patches)
+if(VCPKG_TARGET_IS_WINDOWS AND DEFINED VCPKG_CLANG_SDK_ROOT)
+    list(APPEND clang_patches windows/clang-c99-probe.patch)
+    list(APPEND clang_patches windows/clang-windows-frontend.patch windows/clang-cpuid-probe.patch)
+endif()
+
 vcpkg_extract_source_archive(
     SOURCE_PATH
     ARCHIVE "${ARCHIVE}"
@@ -17,6 +23,7 @@ vcpkg_extract_source_archive(
         windows/spin_delay.patch
         windows/getopt.patch
         windows/pthread-symbols.patch
+        ${clang_patches}
 )
 
 file(GLOB _py3_include_path "${CURRENT_HOST_INSTALLED_DIR}/include/python3*")

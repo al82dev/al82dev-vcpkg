@@ -1,0 +1,8 @@
+shader-slang provides the static CMake target:
+
+  find_package(slang CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE slang::slang)
+
+Slang loads optional backend modules and standard modules at runtime. Deploy
+the required files from tools/shader-slang beside the executable. The LLVM
+backend is a separately loaded DLL, built from source with the static CRT.

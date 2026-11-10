@@ -83,6 +83,12 @@ cmake_path(NATIVE_PATH VCPKG_DETECTED_CMAKE_LINKER NORMALIZE ld)
 #
 # Put the built bits in subdirectories with DESTDIR then move them where they go after the fact
 # instead.
+if(DEFINED VCPKG_CLANG_SDK_ROOT)
+    # jom understands NMake makefiles and is an auxiliary build tool; the
+    # compiler and linker remain the explicitly detected LLVM tools below.
+    vcpkg_find_acquire_program(JOM)
+    set(NMAKE "${JOM}")
+endif()
 vcpkg_build_nmake(
     SOURCE_PATH "${SOURCE_PATH}"
     PREFER_JOM

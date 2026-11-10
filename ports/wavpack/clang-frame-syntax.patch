@@ -1,0 +1,64 @@
+--- a/src/pack_x64.asm
++++ b/src/pack_x64.asm
+@@ -1074,7 +1074,8 @@
+ 
+ ; entry points of function
+ 
+-pack_decorr_mono_buffer_x64win proc public frame
++public pack_decorr_mono_buffer_x64win
++pack_decorr_mono_buffer_x64win proc frame
+         push_reg    rbp                     ; save non-volatile registers on stack
+         push_reg    rbx                     ; (alphabetically)
+         push_reg    rdi
+@@ -1424,7 +1425,8 @@
+ ; r10 = eptr
+ ;
+ 
+-pack_decorr_mono_pass_cont_x64win proc public frame
++public pack_decorr_mono_pass_cont_x64win
++pack_decorr_mono_pass_cont_x64win proc frame
+         push_reg    rbp
+         push_reg    rbx
+         push_reg    rdi
+@@ -1625,7 +1627,8 @@
+ ;   mm1, mm2    scratch
+ ;
+ 
+-scan_max_magnitude_x64win proc public frame
++public scan_max_magnitude_x64win
++scan_max_magnitude_x64win proc frame
+         push_reg    rbp                     ; save non-volatile registers on stack
+         push_reg    rbx                     ; (alphabetically)
+         push_reg    rdi
+@@ -1759,7 +1762,8 @@
+ 
+         .radix  10
+ 
+-log2buffer_x64win proc public frame
++public log2buffer_x64win
++log2buffer_x64win proc frame
+         push_reg    rbp                     ; save non-volatile registers on stack
+         push_reg    rbx                     ; (alphabetically)
+         push_reg    rdi
+--- a/src/unpack_x64.asm
++++ b/src/unpack_x64.asm
+@@ -54,7 +54,8 @@
+ ; [rsp+0] = *dpp
+ ;
+ 
+-unpack_decorr_stereo_pass_cont_x64win proc public frame
++public unpack_decorr_stereo_pass_cont_x64win
++unpack_decorr_stereo_pass_cont_x64win proc frame
+         push_reg    rbp                     ; save non-volatile registers on stack
+         push_reg    rbx                     ; (alphabetically)
+         push_reg    rdi
+@@ -670,7 +671,8 @@
+ ; [rsp+0] = *dpp
+ ;
+ 
+-unpack_decorr_mono_pass_cont_x64win proc public frame
++public unpack_decorr_mono_pass_cont_x64win
++unpack_decorr_mono_pass_cont_x64win proc frame
+         push_reg    rbp                     ; save non-volatile registers on stack
+         push_reg    rbx                     ; (alphabetically)
+         push_reg    rdi
